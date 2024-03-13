@@ -9,12 +9,14 @@ class ShortestPathFinder:
     def find_shortest_path(self, initial_state, destination, max_path: int = 1000):
         state = initial_state
         path = [list(self.city_map['intersections'].keys())[state]]
-        max = 0
-        while state != destination and max < max_path:
-            action = np.argmax(self.Q[state])
+        steps = 0
+        while state != destination and steps < max_path:
+            q_values = self.Q[state].copy()
+            q_values[state] = -np.inf
+            action = np.argmax(q_values)
             next_intersection = list(self.city_map['intersections'].keys())[action]
             path.append(next_intersection)
             next_state = list(self.city_map['intersections'].keys()).index(next_intersection)
             state = next_state
-            max += 1
+            steps += 1
         return path
