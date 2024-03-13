@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+
 class ReAlgorithmFactory:
     def __init__(self, city_map: dict = None, rewards: dict = None):
         self.lambda_functions = {
@@ -22,7 +23,7 @@ class ReAlgorithmFactory:
         self.epsilon = float(q_learning_parameters['epsilon'])
         self.num_intersections = len(city_map['intersections'])
         self.num_actions = self.num_intersections
-        #the Q - table stores the expected rewards for taking each action in each state
+        # the Q - table stores the expected rewards for taking each action in each state
         self.Q = np.zeros((self.num_intersections, self.num_actions))
 
         input_size = self.num_intersections
@@ -53,12 +54,12 @@ class ReAlgorithmFactory:
         return action
 
     def take_action(self, state, city_map):
-        #selects a random neighbor of the current intersection and checks the traffic condition.
+        # selects a random neighbor of the current intersection and checks the traffic condition.
         intersection = list(city_map['intersections'].keys())[state]
         neighbors = city_map['intersections'][intersection]['neighbors']
         next_intersection = np.random.choice(list(neighbors.keys()))
         traffic_condition = city_map['traffic_conditions'].get(f"{intersection}-{next_intersection}", 'normal')
-        #The reward is determined based on the traffic condition.
+        # The reward is determined based on the traffic condition.
         if traffic_condition == 'light':
             reward = self.rewards['waiting_penalty']
         elif traffic_condition == 'congested':
@@ -119,12 +120,13 @@ class ReAlgorithmFactory:
         else:
             raise ValueError("Invalid key: {}".format(key))
 
+
 class DQN(nn.Module):
     def __init__(self, input_size, output_size):
         super(DQN, self).__init__()
-        self.fc1 = nn.Linear(input_size, 1)
-        self.fc2 = nn.Linear(1, 1)
-        self.fc3 = nn.Linear(1, output_size)
+        self.fc1 = nn.Linear(input_size, 64)
+        self.fc2 = nn.Linear(64, 64)
+        self.fc3 = nn.Linear(64, output_size)
 
     def forward(self, x):
         x = torch.relu(self.fc1(x))
